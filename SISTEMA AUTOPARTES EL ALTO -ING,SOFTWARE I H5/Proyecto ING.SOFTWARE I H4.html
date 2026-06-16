@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Autopartes El Alto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary: #4F46E5;
+    --primary-dark: #3730A3;
+    --primary-light: #EEF2FF;
+    --success: #16A34A;
+    --success-light: #DCFCE7;
+    --warning: #D97706;
+    --warning-light: #FEF3C7;
+    --danger: #DC2626;
+    --danger-light: #FEE2E2;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-400: #9CA3AF;
+    --gray-500: #6B7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --white: #FFFFFF;
+    --radius: 8px;
+    --radius-lg: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.06);
+  }
+  body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(--gray-900); font-size: 14px; min-height: 100vh; }
+
+  /* LOGIN */
+  #login-screen {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; background: linear-gradient(135deg, #EEF2FF 0%, #F5F3FF 100%);
+  }
+  .login-card {
+    background: var(--white); border-radius: var(--radius-lg); padding: 2.5rem 2rem;
+    width: 100%; max-width: 380px; box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+  }
+  .login-icon {
+    width: 56px; height: 56px; background: var(--primary); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;
+  }
+  .login-icon svg { width: 28px; height: 28px; fill: none; stroke: white; stroke-width: 2; }
+  .login-title { text-align: center; font-size: 22px; font-weight: 600; color: var(--gray-900); margin-bottom: 0.25rem; }
+  .login-sub { text-align: center; color: var(--gray-500); font-size: 13px; margin-bottom: 2rem; }
+  .form-group { margin-bottom: 1rem; }
+  .form-label { display: block; font-size: 13px; font-weight: 500; color: var(--gray-700); margin-bottom: 6px; }
+  .form-input {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--gray-200);
+    border-radius: var(--radius); font-size: 14px; color: var(--gray-900);
+    background: var(--gray-50); transition: border 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+  }
+  .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); background: var(--white); }
+  .btn-primary {
+    width: 100%; padding: 11px; background: var(--primary); color: white;
+    border: none; border-radius: var(--radius); font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: background 0.15s; font-family: inherit; margin-top: 0.5rem;
+  }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .login-hint { text-align: center; font-size: 12px; color: var(--gray-400); margin-top: 1rem; }
+  .login-error { background: var(--danger-light); color: var(--danger); border-radius: var(--radius); padding: 8px 12px; font-size: 13px; margin-bottom: 1rem; display: none; }
+
+  /* APP */
+  #app-screen { display: none; flex-direction: column; min-height: 100vh; }
+
+  /* NAVBAR */
+  .navbar {
+    background: var(--white); border-bottom: 1px solid var(--gray-200);
+    padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between;
+    height: 56px; position: sticky; top: 0; z-index: 100;
+  }
+  .navbar-brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; color: var(--gray-900); }
+  .navbar-brand-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .navbar-brand-icon svg { width: 18px; height: 18px; fill: none; stroke: white; stroke-width: 2; }
+  .nav-tabs { display: flex; gap: 2px; }
+  .nav-tab {
+    padding: 6px 14px; border-radius: var(--radius); cursor: pointer;
+    font-size: 13px; font-weight: 500; color: var(--gray-500);
+    border: none; background: none; font-family: inherit; transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .nav-tab:hover { background: var(--gray-100); color: var(--gray-900); }
+  .nav-tab.active { background: var(--primary-light); color: var(--primary); }
+  .nav-tab svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+  .navbar-right { display: flex; align-items: center; gap: 12px; }
+  .user-badge { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-700); }
+  .user-avatar { width: 32px; height: 32px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; color: var(--primary); }
+  .btn-logout { padding: 6px 12px; border: 1px solid var(--gray-200); border-radius: var(--radius); background: none; cursor: pointer; font-size: 13px; color: var(--gray-500); font-family: inherit; transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
+  .btn-logout:hover { background: var(--gray-100); color: var(--gray-700); }
+  .btn-logout svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+  /* PAGES */
+  .page { display: none; padding: 1.5rem; max-width: 1100px; margin: 0 auto; width: 100%; }
+  .page.active { display: block; }
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.5rem; }
+  .page-title { font-size: 18px; font-weight: 600; color: var(--gray-900); }
+  .page-sub { font-size: 13px; color: var(--gray-500); margin-top: 2px; }
+
+  /* BUTTONS */
+  .btn { padding: 8px 14px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; border: none; }
+  .btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-filled { background: var(--primary); color: white; }
+  .btn-filled:hover { background: var(--primary-dark); }
+  .btn-outline { background: white; color: var(--gray-700); border: 1px solid var(--gray-200); }
+  .btn-outline:hover { background: var(--gray-50); }
+  .btn-danger { background: var(--danger); color: white; }
+  .btn-danger:hover { background: #B91C1C; }
+  .btn-success { background: var(--success); color: white; }
+  .btn-success:hover { background: #15803D; }
+
+  /* CARDS */
+  .card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); }
+  .card-body { padding: 1.25rem; }
+
+  /* STATS */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+  .stat-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1rem 1.25rem; }
+  .stat-label { font-size: 12px; color: var(--gray-500); font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 8px; }
+  .stat-value { font-size: 24px; font-weight: 600; color: var(--gray-900); }
+  .stat-icon { width: 36px; height: 36px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .stat-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+  .si-purple { background: var(--primary-light); color: var(--primary); }
+  .si-green { background: var(--success-light); color: var(--success); }
+  .si-amber { background: var(--warning-light); color: var(--warning); }
+  .si-red { background: var(--danger-light); color: var(--danger); }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--gray-200); background: var(--gray-50); }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); font-size: 13px; }
+  tbody tr:hover td { background: var(--gray-50); }
+  tbody tr:last-child td { border-bottom: none; }
+
+  /* BADGES */
+  .badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge-success { background: var(--success-light); color: #15803D; }
+  .badge-warning { background: var(--warning-light); color: #B45309; }
+  .badge-danger { background: var(--danger-light); color: #B91C1C; }
+
+  /* SEARCH/FILTER */
+  .toolbar { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .search-wrap { position: relative; flex: 1; min-width: 180px; }
+  .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--gray-400); fill: none; stroke: currentColor; stroke-width: 2; pointer-events: none; }
+  .search-input { width: 100%; padding: 8px 12px 8px 34px; border: 1px solid var(--gray-200); border-radius: var(--radius); font-size: 13px; font-family: inherit; background: var(--white); color: var(--gray-900); }
+  .search-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+  .filter-select { padding: 8px 12px; border: 1px solid var(--gray-200); border-radius: var(--radius); font-size: 13px; font-family: inherit; background: var(--white); color: var(--gray-900); cursor: pointer; }
+  .filter-select:focus { outline: none; border-color: var(--primary); }
+
+  /* MODAL */
+  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+  .modal-bg.open { display: flex; }
+  .modal { background: var(--white); border-radius: var(--radius-lg); width: 100%; max-width: 480px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+  .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; }
+  .modal-title { font-weight: 600; font-size: 15px; }
+  .modal-close { background: none; border: none; cursor: pointer; color: var(--gray-400); padding: 4px; border-radius: var(--radius); }
+  .modal-close:hover { color: var(--gray-700); background: var(--gray-100); }
+  .modal-close svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; display: block; }
+  .modal-body { padding: 1.5rem; }
+  .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--gray-200); display: flex; gap: 8px; justify-content: flex-end; }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .modal-grid .full { grid-column: 1 / -1; }
+
+  /* VENTAS */
+  .ventas-layout { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; align-items: start; }
+  .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+  .product-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem; cursor: pointer; transition: all 0.15s; }
+  .product-card:hover { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.08); }
+  .product-card.out-of-stock { opacity: 0.5; cursor: not-allowed; }
+  .product-card-sku { font-size: 11px; color: var(--gray-400); font-weight: 600; margin-bottom: 4px; }
+  .product-card-name { font-size: 13px; font-weight: 500; color: var(--gray-900); margin-bottom: 6px; line-height: 1.3; }
+  .product-card-price { font-size: 16px; font-weight: 600; color: var(--primary); }
+  .product-card-stock { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+  .cart-box { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); position: sticky; top: 72px; }
+  .cart-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--gray-200); font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .cart-header svg { width: 16px; height: 16px; fill: none; stroke: var(--primary); stroke-width: 2; }
+  .cart-items { padding: 0.75rem 1.25rem; min-height: 200px; }
+  .cart-empty { text-align: center; color: var(--gray-400); padding: 2rem 0; font-size: 13px; }
+  .cart-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--gray-100); font-size: 13px; }
+  .cart-item:last-child { border-bottom: none; }
+  .cart-item-name { color: var(--gray-700); flex: 1; }
+  .cart-item-qty { display: flex; align-items: center; gap: 6px; margin: 0 10px; }
+  .qty-btn { width: 22px; height: 22px; border: 1px solid var(--gray-200); border-radius: 50%; background: none; cursor: pointer; font-size: 14px; color: var(--gray-600); display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .qty-btn:hover { background: var(--gray-100); }
+  .cart-item-total { font-weight: 500; color: var(--gray-900); min-width: 50px; text-align: right; }
+  .cart-footer { padding: 1rem 1.25rem; border-top: 1px solid var(--gray-200); }
+  .cart-total-row { display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 15px; }
+  .cart-total-label { color: var(--gray-500); }
+  .cart-total-value { font-weight: 600; font-size: 18px; color: var(--gray-900); }
+
+  /* REPORTES */
+  .report-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.5rem; }
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  .chart-container { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.25rem; }
+  .chart-title { font-size: 14px; font-weight: 600; color: var(--gray-900); margin-bottom: 1rem; }
+  .chart-wrapper { position: relative; width: 100%; height: 220px; }
+  .chart-wrapper canvas { position: absolute; inset: 0; }
+
+  /* ALERT */
+  .alert-banner { background: var(--warning-light); border: 1px solid #FDE68A; border-radius: var(--radius); padding: 10px 14px; font-size: 13px; color: #92400E; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+  .alert-banner svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; flex-shrink: 0; }
+
+  /* TOAST */
+  #toast { position: fixed; bottom: 24px; right: 24px; background: var(--gray-900); color: white; padding: 10px 16px; border-radius: var(--radius); font-size: 13px; z-index: 999; transform: translateY(60px); opacity: 0; transition: all 0.25s; pointer-events: none; }
+  #toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 700px) {
+    .ventas-layout { grid-template-columns: 1fr; }
+    .report-metrics { grid-template-columns: repeat(2, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+    .modal-grid { grid-template-columns: 1fr; }
+    .nav-tabs { gap: 0; }
+    .nav-tab { padding: 6px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    </div>
+    <h1 class="login-title">Sistema de Autopartes</h1>
+    <p class="login-sub">Ingresa tus credenciales</p>
+    <div id="login-error" class="login-error">Usuario o contraseña incorrectos.</div>
+    <div class="form-group">
+      <label class="form-label">Correo electrónico</label>
+      <input type="email" id="login-email" class="form-input" placeholder="admin@autopartes.com" value="admin@autopartes.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Contraseña</label>
+      <input type="password" id="login-pass" class="form-input" placeholder="••••••••" value="admin123">
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Iniciar sesión</button>
+    <p class="login-hint">Demo: admin@autopartes.com / admin123</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      Sistema de Autopartes
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPage('inventario')">
+        <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM4 7V5a2 2 0 012-2h12a2 2 0 012 2v2"/></svg>
+        Inventario
+      </button>
+      <button class="nav-tab" onclick="showPage('ventas')">
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+        Ventas
+      </button>
+      <button class="nav-tab" onclick="showPage('reportes')">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Reportes
+      </button>
+    </div>
+    <div class="navbar-right">
+      <div class="user-badge">
+        <div class="user-avatar">AU</div>
+        <div>
+          <div style="font-weight:500;font-size:12px">Admin Usuario</div>
+          <div style="color:var(--gray-400);font-size:11px">Administrador</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Salir
+      </button>
+    </div>
+  </nav>
+
+  <!-- INVENTARIO -->
+  <div id="page-inventario" class="page active">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Inventario de Autopartes</div>
+        <div class="page-sub">Gestiona tu inventario de productos</div>
+      </div>
+      <button class="btn btn-filled" onclick="openModal('add')">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Agregar producto
+      </button>
+    </div>
+    <div id="low-stock-alert" class="alert-banner" style="display:none">
+      <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span id="low-stock-text"></span>
+    </div>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" placeholder="Buscar por nombre, SKU o marca..." oninput="filterInventario()" id="inv-search">
+      </div>
+      <select class="filter-select" onchange="filterInventario()" id="inv-cat">
+        <option value="">Todas las categorías</option>
+        <option>Filtros</option><option>Frenos</option><option>Suspensión</option>
+        <option>Eléctrico</option><option>Motor</option><option>Lubricantes</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table id="inv-table">
+          <thead>
+            <tr>
+              <th>SKU</th><th>Producto</th><th>Categoría</th><th>Marca</th>
+              <th>Precio</th><th>Stock</th><th>Estado</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="inv-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- VENTAS -->
+  <div id="page-ventas" class="page">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Nueva venta</div>
+        <div class="page-sub">Selecciona productos para agregar al carrito</div>
+      </div>
+    </div>
+    <div class="ventas-layout">
+      <div>
+        <div class="toolbar">
+          <div class="search-wrap" style="max-width:340px">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="search-input" placeholder="Buscar productos..." oninput="filterVentas()" id="venta-search">
+          </div>
+        </div>
+        <div class="product-grid" id="product-grid"></div>
+      </div>
+      <div class="cart-box">
+        <div class="cart-header">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+          Carrito
+        </div>
+        <div class="cart-items" id="cart-items">
+          <div class="cart-empty" id="cart-empty">El carrito está vacío</div>
+        </div>
+        <div class="cart-footer">
+          <div class="cart-total-row">
+            <span class="cart-total-label">Total</span>
+            <span class="cart-total-value" id="cart-total">$0</span>
+          </div>
+          <button class="btn btn-success" style="width:100%" onclick="procesarVenta()">
+            <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2"><polyline points="20 6 9 17 4 12"/></svg>
+            Confirmar venta
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORTES -->
+  <div id="page-reportes" class="page">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Reportes y rentabilidad</div>
+        <div class="page-sub">Análisis de ventas y desempeño</div>
+      </div>
+    </div>
+    <div class="report-metrics" id="report-metrics"></div>
+    <div class="charts-row">
+      <div class="chart-container">
+        <div class="chart-title">Ventas por día</div>
+        <div class="chart-wrapper"><canvas id="chart-ventas"></canvas></div>
+      </div>
+      <div class="chart-container">
+        <div class="chart-title">Ventas por categoría</div>
+        <div class="chart-wrapper"><canvas id="chart-categoria"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body" style="padding-bottom:0">
+        <div style="font-weight:600;font-size:14px;margin-bottom:1rem">Historial de ventas</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Fecha</th><th>Vendedor</th><th>Productos</th><th>Total</th></tr></thead>
+          <tbody id="sales-history"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AGREGAR/EDITAR -->
+<div class="modal-bg" id="modal-producto">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-titulo">Agregar producto</div>
+      <button class="modal-close" onclick="closeModal()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-grid">
+        <div>
+          <label class="form-label">SKU</label>
+          <input type="text" class="form-input" id="m-sku" placeholder="FLT-001">
+        </div>
+        <div>
+          <label class="form-label">Categoría</label>
+          <select class="form-input filter-select" id="m-cat" style="width:100%">
+            <option>Filtros</option><option>Frenos</option><option>Suspensión</option>
+            <option>Eléctrico</option><option>Motor</option><option>Lubricantes</option>
+          </select>
+        </div>
+        <div class="full">
+          <label class="form-label">Nombre del producto</label>
+          <input type="text" class="form-input" id="m-nombre" placeholder="Filtro de Aceite Premium">
+        </div>
+        <div>
+          <label class="form-label">Marca</label>
+          <input type="text" class="form-input" id="m-marca" placeholder="Bosch">
+        </div>
+        <div>
+          <label class="form-label">Precio (Bs.)</label>
+          <input type="number" class="form-input" id="m-precio" placeholder="150" min="0">
+        </div>
+        <div>
+          <label class="form-label">Stock inicial</label>
+          <input type="number" class="form-input" id="m-stock" placeholder="50" min="0">
+        </div>
+        <div>
+          <label class="form-label">Stock mínimo (alerta)</label>
+          <input type="number" class="form-input" id="m-minstock" placeholder="10" min="0">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-filled" onclick="guardarProducto()">Guardar producto</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR ELIMINAR -->
+<div class="modal-bg" id="modal-delete">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-header">
+      <div class="modal-title">Eliminar producto</div>
+      <button class="modal-close" onclick="document.getElementById('modal-delete').classList.remove('open')">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--gray-700)">¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="document.getElementById('modal-delete').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-danger" onclick="confirmarEliminar()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+// ---- DATA ----
+let products = [
+  {id:1,sku:'FLT-001',nombre:'Filtro de Aceite',categoria:'Filtros',marca:'Bosch',precio:150,stock:45,minStock:10},
+  {id:2,sku:'BRK-001',nombre:'Pastillas de Freno Delanteras',categoria:'Frenos',marca:'Brembo',precio:850,stock:28,minStock:15},
+  {id:3,sku:'SUS-001',nombre:'Amortiguador Trasero',categoria:'Suspensión',marca:'Monroe',precio:1200,stock:12,minStock:8},
+  {id:4,sku:'BAT-001',nombre:'Batería 12V 60Ah',categoria:'Eléctrico',marca:'AC Delco',precio:2500,stock:8,minStock:5},
+  {id:5,sku:'FLT-002',nombre:'Filtro de Aire',categoria:'Filtros',marca:'Mann',precio:180,stock:52,minStock:12},
+  {id:6,sku:'BUJ-001',nombre:'Bujías (Set de 4)',categoria:'Motor',marca:'NGK',precio:320,stock:35,minStock:10},
+  {id:7,sku:'LUB-001',nombre:'Aceite Motor 5W-30',categoria:'Lubricantes',marca:'Mobil',precio:280,stock:60,minStock:20},
+  {id:8,sku:'FRN-001',nombre:'Disco de Freno',categoria:'Frenos',marca:'Brembo',precio:750,stock:18,minStock:6},
+  {id:9,sku:'MOT-001',nombre:'Bomba de Agua',categoria:'Motor',marca:'Gates',precio:620,stock:9,minStock:4},
+];
+
+let sales = [
+  {id:'S001',fecha:'1/5/2026',vendedor:'Vendedor Juan',items:[{nombre:'Filtro de Aceite',qty:1,precio:150},{nombre:'Filtro de Aire',qty:1,precio:180}],total:330},
+  {id:'S002',fecha:'2/5/2026',vendedor:'Admin Usuario',items:[{nombre:'Bujías (Set de 4)',qty:2,precio:320}],total:640},
+  {id:'S003',fecha:'3/5/2026',vendedor:'Vendedor Juan',items:[{nombre:'Batería 12V 60Ah',qty:1,precio:2500}],total:2500},
+  {id:'S004',fecha:'5/5/2026',vendedor:'Vendedor Juan',items:[{nombre:'Pastillas de Freno Delanteras',qty:1,precio:850},{nombre:'Disco de Freno',qty:1,precio:750}],total:1600},
+  {id:'S005',fecha:'6/5/2026',vendedor:'Admin Usuario',items:[{nombre:'Amortiguador Trasero',qty:2,precio:1200}],total:2400},
+  {id:'S006',fecha:'8/5/2026',vendedor:'Vendedor Juan',items:[{nombre:'Aceite Motor 5W-30',qty:3,precio:280}],total:840},
+  {id:'S007',fecha:'9/5/2026',vendedor:'Vendedor Juan',items:[{nombre:'Bomba de Agua',qty:1,precio:620},{nombre:'Filtro de Aceite',qty:2,precio:150}],total:920},
+];
+
+let cart = {};
+let nextId = 10;
+let editingId = null;
+let deletingId = null;
+let chartsInit = false;
+
+// ---- AUTH ----
+function doLogin() {
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-pass').value;
+  if (email === 'admin@autopartes.com' && pass === 'admin123') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'flex';
+    renderInventario();
+    renderVentas();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+function doLogout() {
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// ---- NAV ----
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'reportes') renderReportes();
+  if (name === 'ventas') renderVentas();
+}
+
+// ---- INVENTARIO ----
+function getEstado(p) {
+  if (p.stock === 0) return '<span class="badge badge-danger">Agotado</span>';
+  if (p.stock <= p.minStock) return '<span class="badge badge-warning">Advertencia</span>';
+  return '<span class="badge badge-success">Disponible</span>';
+}
+
+function renderInventario() {
+  const search = (document.getElementById('inv-search')?.value || '').toLowerCase();
+  const cat = document.getElementById('inv-cat')?.value || '';
+  const filtered = products.filter(p => {
+    const matchSearch = p.nombre.toLowerCase().includes(search) || p.sku.toLowerCase().includes(search) || p.marca.toLowerCase().includes(search);
+    const matchCat = !cat || p.categoria === cat;
+    return matchSearch && matchCat;
+  });
+
+  const lowStock = products.filter(p => p.stock > 0 && p.stock <= p.minStock);
+  const alert = document.getElementById('low-stock-alert');
+  if (lowStock.length > 0) {
+    alert.style.display = 'flex';
+    document.getElementById('low-stock-text').textContent = `Alerta: ${lowStock.length} producto(s) con stock bajo: ${lowStock.map(p=>p.nombre).join(', ')}`;
+  } else {
+    alert.style.display = 'none';
+  }
+
+  const body = document.getElementById('inv-body');
+  body.innerHTML = filtered.map(p => `
+    <tr>
+      <td style="font-family:monospace;font-size:12px;color:var(--gray-400)">${p.sku}</td>
+      <td style="font-weight:500;color:var(--gray-900)">${p.nombre}</td>
+      <td>${p.categoria}</td>
+      <td>${p.marca}</td>
+      <td style="font-weight:500">Bs. ${p.precio.toLocaleString()}</td>
+      <td>${p.stock} uds.</td>
+      <td>${getEstado(p)}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="openModal('edit',${p.id})">
+          <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="btn btn-sm" style="background:var(--danger-light);color:var(--danger);border:none;margin-left:4px" onclick="openDelete(${p.id})">
+          <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterInventario() { renderInventario(); }
+
+// ---- MODAL ----
+function openModal(mode, id) {
+  editingId = null;
+  document.getElementById('modal-titulo').textContent = mode === 'add' ? 'Agregar producto' : 'Editar producto';
+  if (mode === 'edit' && id) {
+    const p = products.find(x => x.id === id);
+    editingId = id;
+    document.getElementById('m-sku').value = p.sku;
+    document.getElementById('m-nombre').value = p.nombre;
+    document.getElementById('m-cat').value = p.categoria;
+    document.getElementById('m-marca').value = p.marca;
+    document.getElementById('m-precio').value = p.precio;
+    document.getElementById('m-stock').value = p.stock;
+    document.getElementById('m-minstock').value = p.minStock;
+  } else {
+    ['m-sku','m-nombre','m-marca','m-precio','m-stock','m-minstock'].forEach(id => document.getElementById(id).value = '');
+  }
+  document.getElementById('modal-producto').classList.add('open');
+}
+function closeModal() { document.getElementById('modal-producto').classList.remove('open'); }
+
+function guardarProducto() {
+  const sku = document.getElementById('m-sku').value.trim();
+  const nombre = document.getElementById('m-nombre').value.trim();
+  const marca = document.getElementById('m-marca').value.trim();
+  const precio = parseFloat(document.getElementById('m-precio').value);
+  const stock = parseInt(document.getElementById('m-stock').value);
+  const minStock = parseInt(document.getElementById('m-minstock').value) || 10;
+  const categoria = document.getElementById('m-cat').value;
+
+  if (!sku || !nombre || !marca || isNaN(precio) || isNaN(stock)) {
+    showToast('Completa todos los campos requeridos');
+    return;
+  }
+
+  if (editingId) {
+    const idx = products.findIndex(p => p.id === editingId);
+    products[idx] = {...products[idx], sku, nombre, categoria, marca, precio, stock, minStock};
+    showToast('Producto actualizado');
+  } else {
+    products.push({id: nextId++, sku, nombre, categoria, marca, precio, stock, minStock});
+    showToast('Producto agregado');
+  }
+  closeModal();
+  renderInventario();
+  renderVentas();
+}
+
+function openDelete(id) {
+  deletingId = id;
+  document.getElementById('modal-delete').classList.add('open');
+}
+function confirmarEliminar() {
+  products = products.filter(p => p.id !== deletingId);
+  document.getElementById('modal-delete').classList.remove('open');
+  renderInventario();
+  renderVentas();
+  showToast('Producto eliminado');
+}
+
+// ---- VENTAS ----
+function renderVentas() {
+  const search = (document.getElementById('venta-search')?.value || '').toLowerCase();
+  const filtered = products.filter(p => p.nombre.toLowerCase().includes(search) || p.sku.toLowerCase().includes(search));
+  document.getElementById('product-grid').innerHTML = filtered.map(p => `
+    <div class="product-card ${p.stock === 0 ? 'out-of-stock' : ''}" onclick="${p.stock > 0 ? `addToCart(${p.id})` : ''}">
+      <div class="product-card-sku">${p.sku}</div>
+      <div class="product-card-name">${p.nombre}</div>
+      <div style="font-size:12px;color:var(--gray-400)">${p.marca}</div>
+      <div class="product-card-price">Bs. ${p.precio.toLocaleString()}</div>
+      <div class="product-card-stock">Stock: ${p.stock} uds. ${p.stock === 0 ? '· Agotado' : p.stock <= p.minStock ? '· Stock bajo' : ''}</div>
+    </div>
+  `).join('');
+  renderCart();
+}
+function filterVentas() { renderVentas(); }
+
+function addToCart(id) {
+  const p = products.find(x => x.id === id);
+  if (!p || p.stock === 0) return;
+  const current = cart[id] ? cart[id].qty : 0;
+  if (current >= p.stock) { showToast('Stock insuficiente'); return; }
+  cart[id] = {producto: p, qty: (current || 0) + 1};
+  renderCart();
+}
+
+function changeQty(id, delta) {
+  if (!cart[id]) return;
+  cart[id].qty += delta;
+  if (cart[id].qty <= 0) delete cart[id];
+  renderCart();
+}
+
+function renderCart() {
+  const ids = Object.keys(cart);
+  const emptyEl = document.getElementById('cart-empty');
+  const itemsEl = document.getElementById('cart-items');
+  if (ids.length === 0) {
+    itemsEl.innerHTML = '<div class="cart-empty">El carrito está vacío</div>';
+    document.getElementById('cart-total').textContent = 'Bs. 0';
+    return;
+  }
+  let total = 0;
+  let html = '';
+  ids.forEach(id => {
+    const {producto, qty} = cart[id];
+    const subtotal = producto.precio * qty;
+    total += subtotal;
+    html += `<div class="cart-item">
+      <div class="cart-item-name">${producto.nombre}</div>
+      <div class="cart-item-qty">
+        <button class="qty-btn" onclick="changeQty(${id},-1)">−</button>
+        <span style="font-size:13px;font-weight:500;min-width:16px;text-align:center">${qty}</span>
+        <button class="qty-btn" onclick="changeQty(${id},1)">+</button>
+      </div>
+      <div class="cart-item-total">Bs. ${subtotal.toLocaleString()}</div>
+    </div>`;
+  });
+  itemsEl.innerHTML = html;
+  document.getElementById('cart-total').textContent = 'Bs. ' + total.toLocaleString();
+}
+
+function procesarVenta() {
+  const ids = Object.keys(cart);
+  if (ids.length === 0) { showToast('Agrega productos al carrito'); return; }
+  let total = 0;
+  const items = [];
+  ids.forEach(id => {
+    const {producto, qty} = cart[id];
+    total += producto.precio * qty;
+    items.push({nombre: producto.nombre, qty, precio: producto.precio});
+    const idx = products.findIndex(p => p.id === parseInt(id));
+    products[idx].stock -= qty;
+  });
+  const now = new Date();
+  const fecha = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()}`;
+  const saleId = 'S' + String(sales.length + 1).padStart(3, '0');
+  sales.push({id: saleId, fecha, vendedor: 'Admin Usuario', items, total});
+  cart = {};
+  renderCart();
+  renderInventario();
+  renderVentas();
+  showToast(`✓ Venta ${saleId} registrada por Bs. ${total.toLocaleString()}`);
+}
+
+// ---- REPORTES ----
+let chartVentas, chartCat;
+
+function renderReportes() {
+  const totalIngresos = sales.reduce((s, v) => s + v.total, 0);
+  const totalGanancia = Math.round(totalIngresos * 0.386);
+  const totalVentas = sales.length;
+  const margen = 38.6;
+
+  document.getElementById('report-metrics').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-icon si-purple"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+      <div class="stat-label">Ingresos totales</div>
+      <div class="stat-value">Bs. ${totalIngresos.toLocaleString()}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon si-green"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+      <div class="stat-label">Ganancia total</div>
+      <div class="stat-value">Bs. ${totalGanancia.toLocaleString()}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon si-amber"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></div>
+      <div class="stat-label">Total ventas</div>
+      <div class="stat-value">${totalVentas}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon si-red"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+      <div class="stat-label">Margen promedio</div>
+      <div class="stat-value">${margen}%</div>
+    </div>
+  `;
+
+  // Historial
+  document.getElementById('sales-history').innerHTML = [...sales].reverse().map(s => `
+    <tr>
+      <td style="font-family:monospace;font-size:12px;color:var(--primary)">${s.id}</td>
+      <td>${s.fecha}</td>
+      <td>${s.vendedor}</td>
+      <td>${s.items.length} item(s)</td>
+      <td style="font-weight:600">Bs. ${s.total.toLocaleString()}</td>
+    </tr>
+  `).join('');
+
+  // Charts
+  if (chartVentas) chartVentas.destroy();
+  if (chartCat) chartCat.destroy();
+
+  const ventasPorDia = {};
+  sales.forEach(s => {
+    ventasPorDia[s.fecha] = (ventasPorDia[s.fecha] || 0) + s.total;
+  });
+  const dias = Object.keys(ventasPorDia);
+  const totalesDia = Object.values(ventasPorDia);
+
+  chartVentas = new Chart(document.getElementById('chart-ventas'), {
+    type: 'line',
+    data: {
+      labels: dias,
+      datasets: [{
+        label: 'Ventas (Bs.)',
+        data: totalesDia,
+        borderColor: '#4F46E5',
+        backgroundColor: 'rgba(79,70,229,0.08)',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: '#4F46E5',
+        pointRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, grid: { color: '#F3F4F6' }, ticks: { font: { size: 11 } } }, x: { grid: { display: false }, ticks: { font: { size: 11 } } } }
+    }
+  });
+
+  const catData = {
+    'Eléctrico': 24, 'Suspensión': 18, 'Lubricantes': 17,
+    'Frenos': 16, 'Filtros': 12, 'Refrigeración': 7, 'Motor': 4
+  };
+  chartCat = new Chart(document.getElementById('chart-categoria'), {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(catData),
+      datasets: [{
+        data: Object.values(catData),
+        backgroundColor: ['#4F46E5','#7C3AED','#2563EB','#D97706','#16A34A','#0891B2','#DC2626'],
+        borderWidth: 2, borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'right', labels: { font: { size: 11 }, boxWidth: 12 } } }
+    }
+  });
+}
+
+// ---- TOAST ----
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
